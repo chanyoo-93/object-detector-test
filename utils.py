@@ -1,3 +1,6 @@
+import os
+import cv2
+
 def calc_overlap(width, height, crop_size, count_x, count_y):
     ovl_x = ((crop_size * count_x) - width) / (count_x - 1)
     ovl_y = ((crop_size * count_y) - height) / (count_y - 1)
@@ -39,10 +42,7 @@ def crop_images(image, crop_dict, name, crop_size, countx, county, file_format):
 
 def listup_files(files_dir):
     _files = os.listdir(files_dir)  # source폴더 내 전체 파일 리스트
-    files = list()
-    for _file in _files:
-        files.append(_file[:-4])
-    files = list(set(files))
+    files = list(set([_file[:-4] for _file in _files]))
     files.sort()
     return files  # 확장자 없는 파일 이름 리스트 반환
 
