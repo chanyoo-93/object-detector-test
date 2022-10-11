@@ -45,3 +45,38 @@ def listup_files(files_dir):
     files = list(set(files))
     files.sort()
     return files  # 확장자 없는 파일 이름 리스트 반환
+
+COLOR = {"0": (0, 255, 0),       # Green
+         "1": (0, 0, 255),       # Red
+         "2": (255, 0, 0),       # Blue
+         "3": (0, 255, 255),     # Yellow
+         "4": (255, 255, 0),     # Cyan
+         "5": (255, 0, 255),     # Magenta
+         "6": (0, 127, 255),     # Orange
+         "7": (127, 0, 255),     # Pink
+         "8": (42, 42, 165),     # Brown
+         "9": (226, 43, 138),    # Blueviolet
+         "10": (80, 127, 255),   # Coral
+         "11": (60, 20, 220),    # Crimson
+         "12": (139, 0, 0),      # Darkblue
+         "13": (139, 139, 0),    # Darkcyan
+         "14": (0, 100, 0),      # Darkgreen
+         "15": (169, 169, 169),  # Darkgray
+         "16": (0, 140, 255),    # Darkorange
+         "17": (143, 188, 143),  # Darkseagreen
+         "18": (139, 61, 72),    # Darkslateblue
+         "19": (255, 191, 0),    # Deekskyblue
+         "20": (105, 105, 105),  # Dimgray
+         "21": (0, 215, 255),    # Gold
+         "22": (47, 255, 173),   # Greenyellow
+         "23": (180, 105, 255),  # Hotpink
+         "24": (92, 92, 205),    # Indianred
+         "25": (240, 255, 255),  # Ivory
+         "26": (0, 255, 0),      # Lime
+         "27": (219, 112, 147),  # Mediumpruple
+         "28": (238, 130, 238),  # Violet
+         "29": (50, 205, 154),   # Yellowgreen
+         "30": (255, 255, 240),  # Azure
+         "31": (220, 245, 245),  # Beige
+         "32": (107, 183, 189),  # Darkkhaki
+         "33": (47, 107, 85)}    # Darkolivegreen
