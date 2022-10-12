@@ -20,6 +20,7 @@ class TrainTestSplit:
     input : dataset directory (path)
             save directory (path)
             train:test ratio (float)
+            file format (txt)
     :return : train.txt, val.txt
     =================
     usage:
@@ -36,8 +37,9 @@ class TrainTestSplit:
     TRAIN DATA >> 80 files
     TEST DATA >> 20 files
     SAVE FILE >> ./train.txt, ./val.txt
+    PROCESS FINISHED
     """
-    def __init__(self, config: dict):#datadir, savedir, ratio):
+    def __init__(self, config: dict):
         self.datadir  = config["datadir"]
         self.savedir  = config["savedir"]
         self.ratio    = config["ratio"]
@@ -75,14 +77,59 @@ class TrainTestSplit:
         print(f'TRAIN DATA >> {len(files_train)} files')
         print(f'TEST DATA >> {len(files_test)} files')
         print(f'SAVE FILE >> {self.savedir}train.txt, {self.savedir}val.txt')
+        print('PROCESS FINISHED')
 
 
-class CropImages:
+class CropImage:
     """
+    == DESCRIPTION ==
+    input : image directory (path)
+            crop save directory (path)
+            crop size (int)
+            file format (txt)
+            target image's channel (bool)
+    :return : cropped images
+    =================
+    usage:
+    datadir=./Data
+    savedir=./Save
+    cropsize=416
+    countx=10
+    county=10
+    fileform=jpg
+    =================
+    output example:
+    IMAGE NAME >> image01.jpg
+    CROP SIZE >> 416
+    CROP IMAGE NAME >> image01-01-01.jpg
+    CROP IMAGE NAME >> image01-01-02.jpg
+    ...
+    IMAGE NAME >> image02.jpg
+    CROP SIZE >> 416
+    CROP IMAGE NAME >> image02-01-01.jpg
+    CROP IMAGE NAME >> image02-01-02.jpg
+    ...
+    PROCESS FINISHED
     """
+    def __init__(self, config: dict):
+        self.datadir  = config["datadir"]
+        self.savedir  = config["savedir"]
+        self.cropsize = config["cropsize"]
+        self.countx  = config["countx"]
+        self.county  = config["county"]
+        self.fileform = config["fileform"]
+
+    def write_crop(self):
+        files = listup_files(self.datadir)
+        for file in files:
+            src = cv2.imread(f'{self.datadir}/{file}.{self.fileform}', cv2.IMREAD_ANYCOLOR)
+            print(f'IMAGE NAME >> {file}.{self.fileform}')
+            print(f'CROP SIZE >> {self.cropsize}')
+            save_crop_images(src, self.savedir, file, self.cropsize, self.countx, self.county, self.fileform)
+        print('PROCESS FINISHED')
 
 
-class MultipleTemplateMatching:
+class TemplateMatching:
     """
     """
 
@@ -96,7 +143,7 @@ class DetectCropByYolo:
     """
     """
 
-
+"""
 traintestsplit = TrainTestSplit(
     {
         "datadir" : input('datadir='),
@@ -107,3 +154,15 @@ traintestsplit = TrainTestSplit(
 )
 traintestsplit.split()
 traintestsplit.write()
+"""
+cropimage = CropImage(
+    {
+        "datadir"  : input('datadir='),
+        "savedir"  : input('savedir='),
+        "cropsize" : int(input('cropsize=')),
+        "countx"   : int(input('countx=')),
+        "county"   : int(input('county=')),
+        "fileform" : input('fileform=')
+    }
+)
+cropimage.write_crop()
