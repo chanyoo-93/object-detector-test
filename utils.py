@@ -6,22 +6,24 @@ def calc_overlap(width, height, crop_size, count_x, count_y):
     ovl_y = ((crop_size * count_y) - height) / (count_y - 1)
     return ovl_x, ovl_y
 
-def save_crop_images(image, save_path, name, crop_size, countx, county, file_format):
-    width, height = image.shape[1], image.shape[0]
+def save_crop_images(image, save_path, name, crop_size, count_x, count_y, fileform):
+    width = image.shape[1]
+    height = image.shape[0]
     crop_size = crop_size
-    count_x = countx
-    count_y = county
+    count_x = count_x
+    count_y = count_y
+    fileform = fileform
     overlap_x, overlap_y = calc_overlap(width, height, crop_size, count_x, count_y)
 
     for x in range(count_x):
         for y in range(count_y):
-            sx = int(crop_width * x) - int(overlap_x * x)
-            sy = int(crop_height * y) - int(overlap_y * y)
-            ex = int(crop_width * (x + 1)) - int(overlap_x * x)
-            ey = int(crop_height * (y + 1)) - int(overlap_y * y)
+            sx = int(crop_size * x) - int(overlap_x * x)
+            sy = int(crop_size * y) - int(overlap_y * y)
+            ex = int(crop_size * (x + 1)) - int(overlap_x * x)
+            ey = int(crop_size * (y + 1)) - int(overlap_y * y)
             crop = image[sy:ey, sx:ex]
-            cv2.imwrite(f'{save_path}/{name}_{x + 1}-{y + 1}.{file_format}', crop)
-            print(f'IMAGE WRITE >> {save_path}/{name}_{x + 1}-{y + 1}.{file_format}')
+            cv2.imwrite(f'{save_path}/{name}_{x + 1}-{y + 1}.{fileform}', crop)
+            print(f'CROP IMAGE NAME >> {save_path}{name}_{x + 1}-{y + 1}.{fileform}')
 
 def crop_images(image, crop_dict, name, crop_size, countx, county, file_format):
     width  : int = image.shape[1]
