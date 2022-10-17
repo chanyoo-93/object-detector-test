@@ -129,26 +129,6 @@ class CropImage:
         print('PROCESS FINISHED')
 
 
-class TemplateMatching:
-    """
-    == DESCRIPTION ==
-    input : (path)
-    :return : 
-    =================
-    usage:
-    models=./models
-    =================
-    output example:
-
-    PROCESS FINISHED
-    """
-
-
-class DetectByYolo:
-    """
-    """
-
-
 class DetectCropByYolo:
     """
     == DESCRIPTION ==
@@ -205,19 +185,21 @@ class DetectCropByYolo:
         src_size = dict()
 
         print('CONFIG, WEIGHTS, NAMES FILE LOADING')
-        cfg = f'{self.models}.cfg'
-        weights = f'{self.models}.weights'
-        names = f'{self.models}.names'
+
+        cfg = './obj.cfg'
+        names = './obj.names'
+        weights = f'./obj_{self.models}.weights'
+
         print('CONFIG, WEIGHTS, NAMES FILE LOAD DONE\n')
 
-        time.sleep(3.0)
+        time.sleep(2.0)
 
         # network load
         print('MODEL FILE LOADING')
         net = cv2.dnn.readNetFromDarknet(cfg, weights)
         print('MODEL FILE LOAD DONE\n')
 
-        time.sleep(3.0)
+        time.sleep(2.0)
 
         # defined 4D blob size
         with open(f'{cfg}', 'r') as f:
@@ -323,3 +305,51 @@ class DetectCropByYolo:
                     cv2.imwrite(f'./Results/{file}/{file}_{ix + 1}-{iy + 1}.{self.fileform}', src)
             print(f'{file}.{self.fileform} >> IMAGE DETECT TIME : {time.time() - start_crop_detect:.2f} sec.')
         print(f'TOTAL RUN TIME : {time.time() - start_detect:.2f} sec.')
+
+    def integrate_results(self):
+        with open(f'{names}', 'r') as f:
+            classes = [line.strip() for line in f.readlines()]
+        files = listup_files('./Test')
+        for file in files:
+            src = cv2.imread(f'./Test/{file}.{self.fileform}', cv2.IMREAD_COLOR)
+            pathlib.Path(f'./Results/{file}.txt').touch()
+            for x in range(self.countx):
+                for y in range(self.county):
+                    with open(f'./Results/{file}/{file}_{x + 1}-{y + 1}.txt', 'r') as f:
+                        filesize = os.path.getsize(f'./Results/{file}/{file}_{x + 1}-{y + 1}.txt')
+                        data = list(csv.reader(f, delimiter=' '))
+                    data = np.array(data)
+                    for line in data:
+                        ## 좌표보정 ##
+                        label = line[0]
+                        cxx, cyy, ww, hh, conf = float(line[1]), float(line[2]), float(line[3]), float(line[4]), float(line[5])
+                        cx = ((cxx * self.cropsize) + (self.cropsize * x) - (ovl_x * x)) / src.shape[1]
+                        cy = ((cyy * self.cropsize) + (self.cropsize * y) - (ovl_y * y)) / src.shape[0]
+                        w = (ww * self.cropsize) / src.shape[1]
+                        h = (hh * self.cropsize) / src.shape[0]
+
+                        with open(f'./Results/{file}.txt', 'a') as f:
+                            if filesize == 0:
+                                pass
+                            else:
+                                f.write(f'{label} {cx:.8f} {cy:.8f} {w:.8f} {h:.8f} {conf:.2f}\n')
+
+            with open(f'./Results/{file}.txt', 'r') as f:
+                data = list(csv.reader(f, delimiter=' '))
+                data = np.array(data)
+            for line in data:
+                label = classes[int(line[0])]
+
+                cx, cy, w, h, conf = float(line[1]), float(line[2]), float(line[3]), float(line[4]), float(line[5])
+                sx = round((cx * src.shape[1]) - ((w * src.shape[1]) / 2))
+                sy = round((cy * src.shape[0]) - ((h * src.shape[0]) / 2))
+                ex = round((cx * src.shape[1]) + ((w * src.shape[1]) / 2))
+                ey = round((cy * src.shape[0]) + ((h * src.shape[0]) / 2))
+
+                cv2.rectangle(src, (sx, sy), (ex, ey), (50, 50, 50), thickness * 2)
+                cv2.rectangle(src, (sx, sy), (ex, ey), COLOR[line[0]], thickness)
+                cv2.putText(src, f'{label}, {conf:.2f}%', (sx, sy - 5), STR_FONT, 0.3, COLOR[line[0]], thickness + 2)
+                cv2.putText(src, f'{label}, {conf:.2f}%', (sx, sy - 5), STR_FONT, 0.3, (0, 0, 0), thickness)
+
+            cv2.imwrite(f'./Results/{file}.{self.fileform}', src)
+        print('PROCESS FINISHED')
